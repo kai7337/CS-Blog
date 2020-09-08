@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import toObject from "form-to-object";
-import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { firestore } from "./utils/database";
 import { Container, Button, Card, ButtonGroup } from "react-bootstrap";
@@ -96,10 +94,6 @@ function CodeBlock({ value, language }) {
 
 function Post({ post }) {
   const { title, text, date, category } = post.data();
-  getInstance = (instance) => {
-    // You can now store and manipulate the simplemde instance.
-    instance.togglePreview();
-  };
 
   return (
     <Card className="mb-5">
@@ -111,7 +105,7 @@ function Post({ post }) {
           <ReactMarkdown source={text} renderers={{ code: CodeBlock }} />
         </Card.Text>
         <Card.Text>
-          <a href="https://repl.it/" target="_blank">
+          <a rel="noopener noreferrer" href="https://repl.it/" target="_blank">
             Test the codes out
           </a>
         </Card.Text>
