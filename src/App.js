@@ -11,8 +11,12 @@ export default function App() {
   const [category, setCategory] = useState(undefined);
   const [posts, setPosts] = useState([]);
   const [reachedEnd, setReachedEnd] = useState(false);
+  const [BegginingReached, setBeginningReached] = useState(false);
 
   useEffect(() => {
+    setReachedEnd(false);
+    setBeginningReached(false);
+
     let query = category
       ? firestore.collection("blog-posts").where("category", "==", category)
       : firestore.collection("blog-posts");
@@ -23,11 +27,13 @@ export default function App() {
       .get()
       .then((data) => {
         setPosts(data.docs);
-        setReachedEnd(false);
+        if (data.docs.length < 3) setReachedEnd(true);
       });
   }, [category]);
 
-  function nextPage() {
+  function showNextPage() {
+    setReachedEnd(false);
+    setBeginningReached(false);
     let query = category
       ? firestore.collection("blog-posts").where("category", "==", category)
       : firestore.collection("blog-posts");
@@ -39,11 +45,13 @@ export default function App() {
       .get()
       .then((data) => {
         if (data.docs.length > 0) setPosts(data.docs);
-        else setReachedEnd(true);
+        else if (data.docs.length < 3) setReachedEnd(true);
       });
   }
 
-  function prevPage() {
+  function showPrevPage() {
+    setReachedEnd(false);
+    setBeginningReached(false);
     let query = category
       ? firestore.collection("blog-posts").where("category", "==", category)
       : firestore.collection("blog-posts");
@@ -53,11 +61,11 @@ export default function App() {
       .limit(3)
       .get()
       .then((data) => {
-        setPosts(data.docs);
-        setReachedEnd(false);
+        if (data.docs.length === 0) setBeginningReached(true);
+        if (data.docs.length > 0) setPosts(data.docs);
+        else if (data.docs.length < 3) setBeginningReached(true);
       });
   }
-
   return (
     <Container className="App">
       <h1>KAI Blog Engine</h1>
@@ -81,8 +89,8 @@ export default function App() {
       {posts.map((post) => (
         <Post post={post} key={post.id} />
       ))}
-      <Button onClick={prevPage}>prev</Button>{" "}
-      {!reachedEnd && <Button onClick={nextPage}>next</Button>}
+      {!BegginingReached && <Button onClick={showPrevPage}>prev</Button>}
+      {!reachedEnd && <Button onClick={showNextPage}>next</Button>}
       <hr />
     </Container>
   );
